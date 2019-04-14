@@ -9,6 +9,7 @@ import android.util.SparseArray
 import com.tiefensuche.motionmate.service.MotionActivity
 import com.tiefensuche.motionmate.service.MotionService
 import com.tiefensuche.motionmate.util.Database
+import com.tiefensuche.motionmate.util.Util
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -31,7 +32,7 @@ class AppTest {
     @Test
     @Throws(Exception::class)
     fun testService() {
-        val mCurrentDate = System.currentTimeMillis() - DateUtils.DAY_IN_MILLIS // -24h, previous day
+        val mCurrentDate = Util.calendar.timeInMillis - DateUtils.DAY_IN_MILLIS // -24h, previous day
         var mCurrentSteps = Random().nextInt(10000) // random steps between 0-10000
 
         ShadowSystemClock.setNanoTime(TimeUnit.NANOSECONDS.convert(mCurrentDate, TimeUnit.MILLISECONDS))
@@ -93,7 +94,7 @@ class AppTest {
         Assert.assertEquals(1, motionActivitySecond.steps)
 
         // change clock to the next day
-        ShadowSystemClock.setNanoTime(TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS))
+        ShadowSystemClock.setNanoTime(TimeUnit.NANOSECONDS.convert(Util.calendar.timeInMillis, TimeUnit.MILLISECONDS))
 
         // simulate sensor event
         m.invoke(service, mCurrentSteps)

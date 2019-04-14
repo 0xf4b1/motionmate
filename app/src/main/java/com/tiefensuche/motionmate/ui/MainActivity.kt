@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         mTextViewCalendarContent = findViewById(R.id.textViewCalendarContent)
         mChart = findViewById(R.id.chart)
         mTextViewChart = findViewById(R.id.textViewChart)
-        setDataForWeek(Calendar.getInstance())
         mCalendarView = findViewById(R.id.calendar)
         mCalendarView!!.minDate = Database.getInstance(this).firstEntry
         mCalendarView!!.maxDate = Util.calendar.timeInMillis
@@ -103,6 +102,9 @@ class MainActivity : AppCompatActivity() {
             i.action = MotionService.ACTION_START_ACTIVITY
             startService(i)
         }
+
+        // initial update of the diagram
+        setDataForWeek(Util.calendar)
 
         // Add some cards with statistics
         setupCards()

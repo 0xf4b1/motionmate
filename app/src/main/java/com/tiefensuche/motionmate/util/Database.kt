@@ -91,9 +91,10 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
 
     private fun generateEntries() {
         val random = Random()
-        for (i in 100 downTo 2) {
-            val cal = Calendar.getInstance()
-            cal.add(Calendar.DAY_OF_MONTH, -i)
+        val cal = Util.calendar
+        cal.add(Calendar.DAY_OF_MONTH, -101)
+        for (i in 0..98) {
+            cal.add(Calendar.DAY_OF_MONTH, 1)
             addEntry(cal.timeInMillis, random.nextInt(8000))
         }
     }
