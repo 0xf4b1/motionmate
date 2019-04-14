@@ -31,13 +31,13 @@ import java.util.*
  * The main activity for the UI of the step counter.
  */
 class MainActivity : AppCompatActivity() {
-    private var mTextViewSteps: TextView? = null
-    private var mTextViewMeters: TextView? = null
-    private var mTextViewCalendarContent: TextView? = null
-    private var mAdapter: TextItemAdapter? = null
-    private var mCalendarView: CalendarView? = null
-    private var mChart: Chart? = null
-    private var mTextViewChart: TextView? = null
+    private lateinit var mTextViewSteps: TextView
+    private lateinit var mTextViewMeters: TextView
+    private lateinit var mTextViewCalendarContent: TextView
+    private lateinit var mCalendarView: CalendarView
+    private lateinit var mChart: Chart
+    private lateinit var mTextViewChart: TextView
+    private var mAdapter: TextItemAdapter = TextItemAdapter()
     private var mCurrentSteps: Int = 0
     private var mSelectedWeek: Int = 0
 
@@ -55,9 +55,9 @@ class MainActivity : AppCompatActivity() {
         mChart = findViewById(R.id.chart)
         mTextViewChart = findViewById(R.id.textViewChart)
         mCalendarView = findViewById(R.id.calendar)
-        mCalendarView!!.minDate = Database.getInstance(this).firstEntry
-        mCalendarView!!.maxDate = Util.calendar.timeInMillis
-        mCalendarView!!.setOnDateChangeListener { _, year, month, dayOfMonth ->
+        mCalendarView.minDate = Database.getInstance(this).firstEntry
+        mCalendarView.maxDate = Util.calendar.timeInMillis
+        mCalendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val cal = Util.calendar
             cal.set(Calendar.YEAR, year)
             cal.set(Calendar.MONTH, month)
@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity() {
 
         val mLayoutManager = LinearLayoutManager(this)
         mRecyclerView.layoutManager = mLayoutManager
-        mAdapter = TextItemAdapter()
         mRecyclerView.adapter = mAdapter
 
         // setup swipeable cards and remove them on swiped, used for activities
@@ -82,14 +81,14 @@ class MainActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val i = Intent(this@MainActivity, MotionService::class.java)
                 i.action = MotionService.ACTION_STOP_ACTIVITY
-                i.putExtra(MotionService.KEY_ID, (mAdapter!![viewHolder.adapterPosition] as MotionActivityTextItem).id)
+                i.putExtra(MotionService.KEY_ID, (mAdapter[viewHolder.adapterPosition] as MotionActivityTextItem).id)
                 startService(i)
-                mAdapter!!.remove(viewHolder.adapterPosition)
+                mAdapter.remove(viewHolder.adapterPosition)
             }
 
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
                 val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
-                return if (mAdapter!![viewHolder.adapterPosition].isSwipeable) {
+                return if (mAdapter[viewHolder.adapterPosition].isSwipeable) {
                     ItemTouchHelper.Callback.makeMovementFlags(0, swipeFlags)
                 } else 0
             }
@@ -119,15 +118,15 @@ class MainActivity : AppCompatActivity() {
 
         // A card that displays sum of steps in the current month
         val stepsThisMonth = Database.getInstance(this).getSumSteps(startOfMonth.timeInMillis)
-        mAdapter!!.add(MotionStatisticsTextItem(getString(R.string.steps_month), stepsThisMonth))
+        mAdapter.add(MotionStatisticsTextItem(getString(R.string.steps_month), stepsThisMonth))
 
         // A card that displays average distance in a day
         val avgSteps = Database.getInstance(this).avgSteps
-        mAdapter!!.add(TextItem(getString(R.string.avg_distance), String.format(Locale.getDefault(), getString(R.string.steps_format), avgSteps * 0.762 / 1000, java.lang.Math.round(avgSteps))))
+        mAdapter.add(TextItem(getString(R.string.avg_distance), String.format(Locale.getDefault(), getString(R.string.steps_format), avgSteps * 0.762 / 1000, java.lang.Math.round(avgSteps))))
 
         // A card that displays overall sum of steps
         val overallSteps = Database.getInstance(this).sumSteps
-        mAdapter!!.add(MotionStatisticsTextItem(getString(R.string.overall_distance), overallSteps))
+        mAdapter.add(MotionStatisticsTextItem(getString(R.string.overall_distance), overallSteps))
     }
 
     private fun subscribeService() {
@@ -147,18 +146,18 @@ class MainActivity : AppCompatActivity() {
     private fun updateView(steps: Int, activities: MutableList<Bundle>?) {
         // update current today's steps in the header
         mCurrentSteps = steps
-        mTextViewMeters!!.text = String.format(getString(R.string.meters_today), Util.stepsToMeters(steps))
-        mTextViewSteps!!.text = resources.getQuantityString(R.plurals.steps_text, steps, steps)
+        mTextViewMeters.text = String.format(getString(R.string.meters_today), Util.stepsToMeters(steps))
+        mTextViewSteps.text = resources.getQuantityString(R.plurals.steps_text, steps, steps)
 
         // update calendar max date for the case that new day started
-        mCalendarView!!.maxDate = Util.calendar.timeInMillis
+        mCalendarView.maxDate = Util.calendar.timeInMillis
 
         // update the cards
-        for (i in 0 until mAdapter!!.itemCount) {
-            if (mAdapter!![i] is MotionStatisticsTextItem) {
-                (mAdapter!![i] as MotionTextItem).updateSteps(steps)
-            } else if (mAdapter!![i] is MotionActivityTextItem) {
-                val item = mAdapter!![i] as MotionActivityTextItem
+        for (i in 0 until mAdapter.itemCount) {
+            if (mAdapter[i] is MotionStatisticsTextItem) {
+                (mAdapter[i] as MotionTextItem).updateSteps(steps)
+            } else if (mAdapter[i] is MotionActivityTextItem) {
+                val item = mAdapter[i] as MotionActivityTextItem
                 for (activity in activities!!) {
                     if (activity.getInt(MotionService.KEY_ID) == item.id) {
                         item.updateSteps(activity.getInt(MotionService.KEY_STEPS))
@@ -180,13 +179,13 @@ class MainActivity : AppCompatActivity() {
             })
             item.updateSteps(activity.getInt(MotionService.KEY_STEPS))
             item.setActive(activity.getBoolean(MotionService.KEY_ACTIVE))
-            mAdapter!!.addTop(item)
+            mAdapter.addTop(item)
         }
 
         // If selected week is the current week, update the diagram with today's steps
         if (mSelectedWeek == Calendar.getInstance().get(Calendar.WEEK_OF_YEAR)) {
-            mChart!!.setCurrentSteps(steps)
-            mChart!!.update()
+            mChart.setCurrentSteps(steps)
+            mChart.update()
         }
     }
 
@@ -202,30 +201,30 @@ class MainActivity : AppCompatActivity() {
         // Jump to the last day of the week
         max.add(Calendar.DAY_OF_YEAR, 6 - Math.floorMod(selected.get(Calendar.DAY_OF_WEEK) - Calendar.getInstance().firstDayOfWeek, 7))
 
-        mChart!!.clearDiagram()
-        mTextViewChart!!.text = String.format(Locale.getDefault(), getString(R.string.week_display_format), min.get(Calendar.WEEK_OF_YEAR), min.timeInMillis, max.timeInMillis)
+        mChart.clearDiagram()
+        mTextViewChart.text = String.format(Locale.getDefault(), getString(R.string.week_display_format), min.get(Calendar.WEEK_OF_YEAR), min.timeInMillis, max.timeInMillis)
 
         // Get the records of the selected week between the min and max timestamps
         val entries = Database.getInstance(this).getEntries(min.timeInMillis, max.timeInMillis)
 
-        mTextViewCalendarContent!!.text = String.format(getString(R.string.no_entry), selected.timeInMillis)
+        mTextViewCalendarContent.text = String.format(getString(R.string.no_entry), selected.timeInMillis)
         for (entry in entries) {
-            mChart!!.setDiagramEntry(entry)
+            mChart.setDiagramEntry(entry)
 
             val cal = Calendar.getInstance()
             cal.timeInMillis = entry.timestamp
 
             // Update the description text with the selected date
             if (cal.get(Calendar.DAY_OF_WEEK) == selected.get(Calendar.DAY_OF_WEEK)) {
-                mTextViewCalendarContent!!.text = String.format(Locale.getDefault(), getString(R.string.steps_day_display), cal.timeInMillis, Util.stepsToMeters(entry.steps), entry.steps)
+                mTextViewCalendarContent.text = String.format(Locale.getDefault(), getString(R.string.steps_day_display), cal.timeInMillis, Util.stepsToMeters(entry.steps), entry.steps)
             }
         }
 
         // If selected week is the current week, update the diagram with today's steps
         if (mSelectedWeek == Calendar.getInstance().get(Calendar.WEEK_OF_YEAR)) {
-            mChart!!.setCurrentSteps(mCurrentSteps)
+            mChart.setCurrentSteps(mCurrentSteps)
         }
-        mChart!!.update()
+        mChart.update()
     }
 
     companion object {

@@ -11,7 +11,7 @@ package com.tiefensuche.motionmate.service
  *
  * Created by tiefensuche on 10.02.18.
  */
-class StepDetector {
+class StepDetector(private var listener: StepListener) {
 
     private var accelRingCounter = 0
     private val accelRingX = FloatArray(ACCEL_RING_SIZE)
@@ -21,12 +21,6 @@ class StepDetector {
     private val velRing = FloatArray(VEL_RING_SIZE)
     private var lastStepTimeNs: Long = 0
     private var oldVelocityEstimate = 0f
-
-    private var listener: StepListener? = null
-
-    fun registerListener(listener: StepListener) {
-        this.listener = listener
-    }
 
     fun updateAccel(timeNs: Long, x: Float, y: Float, z: Float) {
         val currentAccel = FloatArray(3)

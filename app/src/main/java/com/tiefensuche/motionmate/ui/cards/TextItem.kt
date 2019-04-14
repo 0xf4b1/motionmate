@@ -26,16 +26,12 @@ open class TextItem(val description: String, private var content: String?) {
 
     fun setContent(content: String) {
         this.content = content
-        if (updateListener != null) {
-            updateListener!!.update(content)
-        }
+        updateListener?.update(content)
     }
 
     fun setIcon(icon: Int) {
         this.icon = icon
-        if (updateListener != null) {
-            updateListener!!.updateIcon(icon)
-        }
+        updateListener?.updateIcon(icon)
     }
 
     fun setUpdateListener(updateListener: UpdateListener) {

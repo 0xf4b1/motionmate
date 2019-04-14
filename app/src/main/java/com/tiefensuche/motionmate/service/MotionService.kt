@@ -41,7 +41,7 @@ import java.util.*
  * Created by tiefensuche on 06.11.16.
  */
 class MotionService : Service() {
-    private var sharedPreferences: SharedPreferences? = null
+    private lateinit var sharedPreferences: SharedPreferences
     // steps at the current day
     private var mTodaysSteps: Int = 0
     // steps reported from sensor
@@ -51,11 +51,11 @@ class MotionService : Service() {
     // current date of counting
     private var mCurrentDate: Long = 0
     private var receiver: ResultReceiver? = null
-    private var simpleStepDetector: StepDetector? = null
-    private var mListener: SensorEventListener? = null
-    private var mNotificationManager: NotificationManager? = null
-    private var mBuilder: NotificationCompat.Builder? = null
-    private var motionActivities: SparseArray<MotionActivity>? = null
+    private lateinit var simpleStepDetector: StepDetector
+    private lateinit var mListener: SensorEventListener
+    private lateinit var mNotificationManager: NotificationManager
+    private lateinit var mBuilder: NotificationCompat.Builder
+    private var motionActivities: SparseArray<MotionActivity> = SparseArray()
     private var motionActivityId = 0
 
     override fun onBind(intent: Intent): IBinder? {
@@ -70,11 +70,9 @@ class MotionService : Service() {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         // get last saved date
-        mCurrentDate = sharedPreferences!!.getLong(KEY_DATE, Util.calendar.timeInMillis)
+        mCurrentDate = sharedPreferences.getLong(KEY_DATE, Util.calendar.timeInMillis)
         // get last steps
-        mTodaysSteps = sharedPreferences!!.getInt(KEY_STEPS, 0)
-
-        motionActivities = SparseArray()
+        mTodaysSteps = sharedPreferences.getInt(KEY_STEPS, 0)
 
         val manager = packageManager
 
@@ -99,8 +97,7 @@ class MotionService : Service() {
             // fallback sensor
             LogHelper.d(TAG, "using fallback sensor accelerometer")
             mStepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-            simpleStepDetector = StepDetector()
-            simpleStepDetector!!.registerListener(object : StepDetector.StepListener {
+            simpleStepDetector = StepDetector(object : StepDetector.StepListener {
                 override fun step(timeNs: Long) {
                     handleEvent(mCurrentSteps + 1)
                 }
@@ -109,7 +106,7 @@ class MotionService : Service() {
 
                 override fun onSensorChanged(event: SensorEvent) {
                     if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-                        simpleStepDetector!!.updateAccel(
+                        simpleStepDetector.updateAccel(
                                 event.timestamp, event.values[0], event.values[1], event.values[2])
                     }
                 }
@@ -148,24 +145,24 @@ class MotionService : Service() {
             // Start counting for the new day
             mTodaysSteps = 0
             mCurrentDate = Util.calendar.timeInMillis
-            sharedPreferences!!.edit().putLong(KEY_DATE, mCurrentDate).apply()
+            sharedPreferences.edit().putLong(KEY_DATE, mCurrentDate).apply()
         }
-        sharedPreferences!!.edit().putInt(KEY_STEPS, mTodaysSteps).apply()
-        for (i in 0 until motionActivities!!.size()) {
-            motionActivities!!.valueAt(i).update(mCurrentSteps)
+        sharedPreferences.edit().putInt(KEY_STEPS, mTodaysSteps).apply()
+        for (i in 0 until motionActivities.size()) {
+            motionActivities.valueAt(i).update(mCurrentSteps)
         }
         sendUpdate()
     }
 
     private fun sendUpdate() {
-        mBuilder!!.setContentText(String.format(Locale.getDefault(), getString(R.string.steps_format), Util.stepsToMeters(mTodaysSteps), mTodaysSteps))
-        mNotificationManager!!.notify(FOREGROUND_ID, mBuilder!!.build())
+        mBuilder.setContentText(String.format(Locale.getDefault(), getString(R.string.steps_format), Util.stepsToMeters(mTodaysSteps), mTodaysSteps))
+        mNotificationManager.notify(FOREGROUND_ID, mBuilder.build())
         if (receiver != null) {
             val bundle = Bundle()
             bundle.putInt(KEY_STEPS, mTodaysSteps)
             val activities = ArrayList<Bundle>()
-            for (i in 0 until motionActivities!!.size()) {
-                val motionActivity = motionActivities!!.valueAt(i)
+            for (i in 0 until motionActivities.size()) {
+                val motionActivity = motionActivities.valueAt(i)
                 val activityBundle = Bundle()
                 activityBundle.putInt(KEY_ID, motionActivity.id)
                 activityBundle.putInt(KEY_STEPS, motionActivity.steps)
@@ -185,10 +182,10 @@ class MotionService : Service() {
                 ACTION_SUBSCRIBE == intent.action -> receiver = intent.getParcelableExtra(MainActivity.RECEIVER_TAG)
                 ACTION_START_ACTIVITY == intent.action -> {
                     val id = motionActivityId++
-                    motionActivities!!.put(id, MotionActivity(id, mCurrentSteps))
+                    motionActivities.put(id, MotionActivity(id, mCurrentSteps))
                 }
-                ACTION_STOP_ACTIVITY == intent.action -> motionActivities!!.remove(intent.getIntExtra(KEY_ID, 0))
-                ACTION_TOGGLE_ACTIVITY == intent.action -> motionActivities!!.get(intent.getIntExtra(KEY_ID, 0)).toggle()
+                ACTION_STOP_ACTIVITY == intent.action -> motionActivities.remove(intent.getIntExtra(KEY_ID, 0))
+                ACTION_TOGGLE_ACTIVITY == intent.action -> motionActivities.get(intent.getIntExtra(KEY_ID, 0)).toggle()
             }
             sendUpdate()
         }
@@ -211,7 +208,7 @@ class MotionService : Service() {
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentIntent(pendingIntent)
-        startForeground(FOREGROUND_ID, mBuilder!!.build())
+        startForeground(FOREGROUND_ID, mBuilder.build())
     }
 
     /**
@@ -219,14 +216,14 @@ class MotionService : Service() {
      */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
-        if (mNotificationManager!!.getNotificationChannel(CHANNEL_ID) == null) {
+        if (mNotificationManager.getNotificationChannel(CHANNEL_ID) == null) {
             val notificationChannel = NotificationChannel(CHANNEL_ID,
                     getString(R.string.app_name),
                     NotificationManager.IMPORTANCE_NONE)
 
             notificationChannel.description = getString(R.string.steps)
 
-            mNotificationManager!!.createNotificationChannel(notificationChannel)
+            mNotificationManager.createNotificationChannel(notificationChannel)
         }
     }
 
