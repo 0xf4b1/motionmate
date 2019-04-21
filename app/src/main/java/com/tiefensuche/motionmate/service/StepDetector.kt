@@ -53,7 +53,7 @@ internal class StepDetector(private var listener: StepListener) {
 
         if (velocityEstimate > STEP_THRESHOLD && oldVelocityEstimate <= STEP_THRESHOLD
                 && timeNs - lastStepTimeNs > STEP_DELAY_NS) {
-            listener!!.step(timeNs)
+            listener.step(timeNs)
             lastStepTimeNs = timeNs
         }
         oldVelocityEstimate = velocityEstimate

@@ -19,13 +19,13 @@ import com.tiefensuche.motionmate.R
 import com.tiefensuche.motionmate.service.MotionService
 import com.tiefensuche.motionmate.ui.cards.MotionActivityTextItem
 import com.tiefensuche.motionmate.ui.cards.MotionStatisticsTextItem
-import com.tiefensuche.motionmate.ui.cards.MotionTextItem
 import com.tiefensuche.motionmate.ui.cards.TextItem
 import com.tiefensuche.motionmate.util.Database
 import com.tiefensuche.motionmate.util.LogHelper
 import com.tiefensuche.motionmate.util.Math
 import com.tiefensuche.motionmate.util.Util
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * The main activity for the UI of the step counter.
@@ -79,11 +79,14 @@ internal class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val i = Intent(this@MainActivity, MotionService::class.java)
-                i.action = MotionService.ACTION_STOP_ACTIVITY
-                i.putExtra(MotionService.KEY_ID, (mAdapter[viewHolder.adapterPosition] as MotionActivityTextItem).id)
-                startService(i)
-                mAdapter.remove(viewHolder.adapterPosition)
+                val item = mAdapter[viewHolder.adapterPosition]
+                if (item is MotionActivityTextItem) {
+                    val i = Intent(this@MainActivity, MotionService::class.java)
+                    i.action = MotionService.ACTION_STOP_ACTIVITY
+                    i.putExtra(MotionService.KEY_ID, item.id)
+                    startService(i)
+                    mAdapter.remove(viewHolder.adapterPosition)
+                }
             }
 
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -136,14 +139,14 @@ internal class MainActivity : AppCompatActivity() {
         i.putExtra(RECEIVER_TAG, object : ResultReceiver(null) {
             override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
                 if (resultCode == 0) {
-                    runOnUiThread { updateView(resultData.getInt(MotionService.KEY_STEPS), resultData.getParcelableArrayList(MotionService.KEY_ACTIVITIES)) }
+                    runOnUiThread { updateView(resultData.getInt(MotionService.KEY_STEPS), resultData.getParcelableArrayList(MotionService.KEY_ACTIVITIES) ?: ArrayList()) }
                 }
             }
         })
         startService(i)
     }
 
-    private fun updateView(steps: Int, activities: MutableList<Bundle>?) {
+    private fun updateView(steps: Int, activities: MutableList<Bundle>) {
         // update current today's steps in the header
         mCurrentSteps = steps
         mTextViewMeters.text = String.format(getString(R.string.meters_today), Util.stepsToMeters(steps))
@@ -154,11 +157,11 @@ internal class MainActivity : AppCompatActivity() {
 
         // update the cards
         for (i in 0 until mAdapter.itemCount) {
-            if (mAdapter[i] is MotionStatisticsTextItem) {
-                (mAdapter[i] as MotionTextItem).updateSteps(steps)
-            } else if (mAdapter[i] is MotionActivityTextItem) {
-                val item = mAdapter[i] as MotionActivityTextItem
-                for (activity in activities!!) {
+            val item = mAdapter[i]
+            if (item is MotionStatisticsTextItem) {
+                item.updateSteps(steps)
+            } else if (item is MotionActivityTextItem) {
+                for (activity in activities) {
                     if (activity.getInt(MotionService.KEY_ID) == item.id) {
                         item.updateSteps(activity.getInt(MotionService.KEY_STEPS))
                         activities.remove(activity)
@@ -169,7 +172,7 @@ internal class MainActivity : AppCompatActivity() {
         }
 
         // initialize dynamic cards, e.g. activities, that are not yet added
-        for (activity in activities!!) {
+        for (activity in activities) {
             val id = activity.getInt(MotionService.KEY_ID)
             val item = MotionActivityTextItem(getString(R.string.new_activity), getString(R.string.new_activity_started), id, View.OnClickListener {
                 val i = Intent(this@MainActivity, MotionService::class.java)

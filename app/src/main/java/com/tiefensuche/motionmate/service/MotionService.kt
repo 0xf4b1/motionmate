@@ -77,7 +77,7 @@ internal class MotionService : Service() {
         val manager = packageManager
 
         // connect sensor
-        val mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val mSensorManager = getSystemService(Context.SENSOR_SERVICE) as? SensorManager ?: throw RuntimeException()
         var mStepSensor: Sensor? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && manager.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_COUNTER)) {
             // androids built in step counter
@@ -157,7 +157,7 @@ internal class MotionService : Service() {
     private fun sendUpdate() {
         mBuilder.setContentText(String.format(Locale.getDefault(), getString(R.string.steps_format), Util.stepsToMeters(mTodaysSteps), mTodaysSteps))
         mNotificationManager.notify(FOREGROUND_ID, mBuilder.build())
-        if (receiver != null) {
+        receiver?.let {
             val bundle = Bundle()
             bundle.putInt(KEY_STEPS, mTodaysSteps)
             val activities = ArrayList<Bundle>()
@@ -170,7 +170,7 @@ internal class MotionService : Service() {
                 activities.add(activityBundle)
             }
             bundle.putParcelableArrayList(KEY_ACTIVITIES, activities)
-            receiver!!.send(0, bundle)
+            it.send(0, bundle)
         }
     }
 
@@ -196,7 +196,7 @@ internal class MotionService : Service() {
     }
 
     private fun startService() {
-        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: throw RuntimeException()
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
         // Notification channels are only supported on Android O+.

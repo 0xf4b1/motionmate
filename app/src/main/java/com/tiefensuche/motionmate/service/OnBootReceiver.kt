@@ -17,7 +17,7 @@ import android.os.Build
  */
 internal class OnBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != null && intent.action!!.equals(Intent.ACTION_BOOT_COMPLETED, ignoreCase = true)) {
+        if (intent.action?.equals(Intent.ACTION_BOOT_COMPLETED, ignoreCase = true) == true) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(Intent(context, MotionService::class.java))
             } else {
