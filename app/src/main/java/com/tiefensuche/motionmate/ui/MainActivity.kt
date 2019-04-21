@@ -30,7 +30,7 @@ import java.util.*
 /**
  * The main activity for the UI of the step counter.
  */
-class MainActivity : AppCompatActivity() {
+internal class MainActivity : AppCompatActivity() {
     private lateinit var mTextViewSteps: TextView
     private lateinit var mTextViewMeters: TextView
     private lateinit var mTextViewCalendarContent: TextView

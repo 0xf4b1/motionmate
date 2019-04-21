@@ -22,25 +22,24 @@ import java.util.*
  *
  * Created by tiefensuche on 19.10.16.
  */
-class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder>() {
+internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder>() {
     private val mDataset = ArrayList<TextItem>()
 
-    fun addTop(item: TextItem) {
+    internal fun addTop(item: TextItem) {
         add(item, 0)
     }
 
-    @JvmOverloads
-    fun add(item: TextItem, position: Int = mDataset.size) {
+    internal fun add(item: TextItem, position: Int = mDataset.size) {
         mDataset.add(position, item)
         notifyItemInserted(position)
     }
 
-    fun remove(index: Int) {
+    internal fun remove(index: Int) {
         mDataset.removeAt(index)
         notifyItemRemoved(index)
     }
 
-    operator fun get(index: Int): TextItem {
+    internal operator fun get(index: Int): TextItem {
         return mDataset[index]
     }
 
@@ -75,10 +74,10 @@ class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder>() {
         return mDataset.size
     }
 
-    inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        val mTextViewDescription: TextView = v.findViewById(R.id.textViewDescription)
-        val mTextViewContent: TextView = v.findViewById(R.id.textViewContent)
-        val mImageButton: ImageButton = v.findViewById(R.id.imageButton)
+    internal inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        internal val mTextViewDescription: TextView = v.findViewById(R.id.textViewDescription)
+        internal val mTextViewContent: TextView = v.findViewById(R.id.textViewContent)
+        internal val mImageButton: ImageButton = v.findViewById(R.id.imageButton)
     }
 
 }

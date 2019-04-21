@@ -21,7 +21,7 @@ import java.util.*
 /**
  * The chart in the UI that shows the weekly step distribution with a bar chart.
  */
-class Chart : BarChart {
+internal class Chart : BarChart {
     private val firstDayOfWeek = Calendar.getInstance().firstDayOfWeek
     private val yVals = ArrayList<BarEntry>()
 
@@ -70,13 +70,13 @@ class Chart : BarChart {
         }
     }
 
-    fun clearDiagram() {
+    internal fun clearDiagram() {
         for (i in yVals.indices) {
             yVals[i].y = 0f
         }
     }
 
-    fun setDiagramEntry(entry: Database.Entry) {
+    internal fun setDiagramEntry(entry: Database.Entry) {
         val cal = Calendar.getInstance()
         cal.timeInMillis = entry.timestamp
 
@@ -90,13 +90,13 @@ class Chart : BarChart {
         }
     }
 
-    fun setCurrentSteps(currentSteps: Int) {
+    internal fun setCurrentSteps(currentSteps: Int) {
         val cal = Calendar.getInstance()
         val currentDay = Math.floorMod(cal.get(Calendar.DAY_OF_WEEK) - firstDayOfWeek, 7)
         yVals[currentDay].y = currentSteps.toFloat()
     }
 
-    fun update() {
+    internal fun update() {
         val set = BarDataSet(yVals, "StepData")
         set.setDrawIcons(false)
         set.setColors(*ColorTemplate.MATERIAL_COLORS)

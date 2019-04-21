@@ -10,7 +10,7 @@ import android.view.View
  * Further specialized [TextItem] that shows step information as activity that can be
  * started and stopped.
  */
-class MotionActivityTextItem(description: String, content: String, val id: Int, listener: View.OnClickListener) : MotionTextItem(description, content) {
+internal class MotionActivityTextItem(description: String, content: String, val id: Int, listener: View.OnClickListener) : MotionTextItem(description, content) {
     private var active = true
 
     override val isSwipeable: Boolean
@@ -23,7 +23,7 @@ class MotionActivityTextItem(description: String, content: String, val id: Int, 
         }
     }
 
-    fun setActive(active: Boolean) {
+    internal fun setActive(active: Boolean) {
         this.active = active
         setIcon(if (active) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play)
     }

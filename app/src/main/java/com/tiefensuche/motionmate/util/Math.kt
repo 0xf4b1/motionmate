@@ -7,7 +7,7 @@ package com.tiefensuche.motionmate.util
 /**
  * From openjdk8 for compatibility for lower api versions
  */
-object Math {
+internal object Math {
 
     /**
      * Returns the largest (closest to positive infinity)
@@ -45,7 +45,7 @@ object Math {
      * @see .floorMod
      * @since 1.8
      */
-    fun floorDiv(x: Int, y: Int): Int {
+    internal fun floorDiv(x: Int, y: Int): Int {
         var r = x / y
         // if the signs are different and modulo not zero, round down
         if (x xor y < 0 && r * y != x) {
@@ -103,7 +103,7 @@ object Math {
      * @see .floorDiv
      * @since 1.8
      */
-    fun floorMod(x: Int, y: Int): Int {
+    internal fun floorMod(x: Int, y: Int): Int {
         return x - floorDiv(x, y) * y
     }
 

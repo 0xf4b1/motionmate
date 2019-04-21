@@ -17,9 +17,9 @@ import java.util.*
  *
  * Created by tiefensuche on 19.10.16.
  */
-class Database private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+internal class Database private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-    val firstEntry: Long
+    internal val firstEntry: Long
         get() {
             val cursor = readableDatabase.query(TABLE_NAME, arrayOf("min(timestamp)"), null, null, null, null, null)
             cursor.moveToFirst()
@@ -28,7 +28,7 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
             return result
         }
 
-    val lastEntry: Long
+    internal val lastEntry: Long
         get() {
             val cursor = readableDatabase.query(TABLE_NAME, arrayOf("max(timestamp)"), null, null, null, null, null)
             cursor.moveToFirst()
@@ -37,7 +37,7 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
             return result
         }
 
-    val avgSteps: Float
+    internal val avgSteps: Float
         get() {
             val cursor = readableDatabase.query(TABLE_NAME, arrayOf("avg(steps)"), null, null, null, null, null)
             cursor.moveToFirst()
@@ -46,7 +46,7 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
             return result
         }
 
-    val sumSteps: Int
+    internal val sumSteps: Int
         get() = getSumSteps(0)
 
     init {
@@ -56,7 +56,7 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
         }
     }
 
-    fun addEntry(timestamp: Long, steps: Int) {
+    internal fun addEntry(timestamp: Long, steps: Int) {
         LogHelper.d(TAG, "add entry to database: $timestamp, $steps")
         val values = ContentValues()
         values.put("timestamp", timestamp)
@@ -69,7 +69,7 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
 
     }
 
-    fun getEntries(minDate: Long, maxDate: Long): List<Entry> {
+    internal fun getEntries(minDate: Long, maxDate: Long): List<Entry> {
         val entries = ArrayList<Entry>()
         val cursor = readableDatabase.query(TABLE_NAME, null, "timestamp >= ? AND timestamp <= ?", arrayOf(java.lang.Long.toString(minDate), java.lang.Long.toString(maxDate)), null, null, null)
         while (cursor.moveToNext()) {
@@ -81,7 +81,7 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
         return entries
     }
 
-    fun getSumSteps(minDate: Long): Int {
+    internal fun getSumSteps(minDate: Long): Int {
         val cursor = readableDatabase.query(TABLE_NAME, arrayOf("sum(steps)"), "timestamp > ?", arrayOf(java.lang.Long.toString(minDate)), null, null, null)
         cursor.moveToFirst()
         val result = cursor.getInt(0)
@@ -107,7 +107,7 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
 
     }
 
-    inner class Entry internal constructor(val timestamp: Long, val steps: Int)
+    internal inner class Entry internal constructor(val timestamp: Long, val steps: Int)
 
     companion object {
 
@@ -119,11 +119,12 @@ class Database private constructor(context: Context) : SQLiteOpenHelper(context,
 
         private var instance: Database? = null
 
-        fun getInstance(context: Context): Database {
+        internal fun getInstance(context: Context): Database {
+            var instance = instance
             if (instance == null) {
                 instance = Database(context)
             }
-            return instance as Database
+            return instance
         }
     }
 }

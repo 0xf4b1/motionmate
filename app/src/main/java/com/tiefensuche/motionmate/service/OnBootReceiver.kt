@@ -15,7 +15,7 @@ import android.os.Build
  *
  * Created by tiefensuche on 10.02.18.
  */
-class OnBootReceiver : BroadcastReceiver() {
+internal class OnBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != null && intent.action!!.equals(Intent.ACTION_BOOT_COMPLETED, ignoreCase = true)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

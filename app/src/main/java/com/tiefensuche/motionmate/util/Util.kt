@@ -4,16 +4,16 @@
 
 package com.tiefensuche.motionmate.util
 
-import java.util.Calendar
+import java.util.*
 
-object Util {
+internal object Util {
 
     /**
      * Get calendar with zeroed time (hours, minutes, seconds)
      *
      * @return Calendar with start of the day
      */
-    val calendar: Calendar
+    internal val calendar: Calendar
         get() {
             val calendar = Calendar.getInstance()
             calendar.clear(Calendar.HOUR)
@@ -30,7 +30,7 @@ object Util {
      * @param steps steps
      * @return kilometers
      */
-    fun stepsToMeters(steps: Int): Double {
+    internal fun stepsToMeters(steps: Int): Double {
         return steps * 0.762 / 1000
     }
 

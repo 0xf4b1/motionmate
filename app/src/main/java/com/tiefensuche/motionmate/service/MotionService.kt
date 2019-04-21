@@ -40,7 +40,7 @@ import java.util.*
  *
  * Created by tiefensuche on 06.11.16.
  */
-class MotionService : Service() {
+internal class MotionService : Service() {
     private lateinit var sharedPreferences: SharedPreferences
     // steps at the current day
     private var mTodaysSteps: Int = 0
@@ -229,15 +229,15 @@ class MotionService : Service() {
 
     companion object {
 
-        const val ACTION_SUBSCRIBE = "ACTION_SUBSCRIBE"
-        const val ACTION_START_ACTIVITY = "ACTION_START_ACTIVITY"
-        const val ACTION_STOP_ACTIVITY = "ACTION_STOP_ACTIVITY"
-        const val ACTION_TOGGLE_ACTIVITY = "ACTION_TOGGLE_ACTIVITY"
-        const val KEY_ID = "ID"
-        const val KEY_STEPS = "STEPS"
-        const val KEY_ACTIVE = "ACTIVE"
-        const val KEY_ACTIVITIES = "ACTIVITIES"
-        const val KEY_DATE = "DATE"
+        internal const val ACTION_SUBSCRIBE = "ACTION_SUBSCRIBE"
+        internal const val ACTION_START_ACTIVITY = "ACTION_START_ACTIVITY"
+        internal const val ACTION_STOP_ACTIVITY = "ACTION_STOP_ACTIVITY"
+        internal const val ACTION_TOGGLE_ACTIVITY = "ACTION_TOGGLE_ACTIVITY"
+        internal const val KEY_ID = "ID"
+        internal const val KEY_STEPS = "STEPS"
+        internal const val KEY_ACTIVE = "ACTIVE"
+        internal const val KEY_ACTIVITIES = "ACTIVITIES"
+        internal const val KEY_DATE = "DATE"
         private val TAG = LogHelper.makeLogTag(MotionService::class.java)
         private const val FOREGROUND_ID = 3843
         private const val CHANNEL_ID = "com.tiefensuche.motionmate.CHANNEL_ID"
