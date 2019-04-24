@@ -123,6 +123,7 @@ internal class Database private constructor(context: Context) : SQLiteOpenHelper
             var instance = instance
             if (instance == null) {
                 instance = Database(context)
+                this.instance = instance
             }
             return instance
         }
