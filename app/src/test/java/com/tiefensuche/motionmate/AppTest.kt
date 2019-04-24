@@ -22,16 +22,16 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
-class AppTest {
+internal class AppTest {
 
     @Before
-    fun setup() {
+    internal fun setup() {
         ShadowLog.stream = System.out
     }
 
     @Test
     @Throws(Exception::class)
-    fun testService() {
+    internal fun testService() {
         val mCurrentDate = Util.calendar.timeInMillis - DateUtils.DAY_IN_MILLIS // -24h, previous day
         var mCurrentSteps = Random().nextInt(10000) // random steps between 0-10000
 
