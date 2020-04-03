@@ -4,13 +4,15 @@
 
 package com.tiefensuche.motionmate.ui.cards
 
+import android.content.Context
 import android.view.View
+import com.tiefensuche.motionmate.R
 
 /**
  * Further specialized [TextItem] that shows step information as activity that can be
  * started and stopped.
  */
-internal class MotionActivityTextItem(description: String, content: String, val id: Int, listener: View.OnClickListener) : MotionTextItem(description, content) {
+internal class MotionActivityTextItem(context: Context, val id: Int, listener: View.OnClickListener) : MotionTextItem(context, R.string.new_activity) {
     private var active = true
 
     override val isSwipeable: Boolean

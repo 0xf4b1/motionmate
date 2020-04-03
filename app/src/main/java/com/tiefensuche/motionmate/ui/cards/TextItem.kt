@@ -4,6 +4,7 @@
 
 package com.tiefensuche.motionmate.ui.cards
 
+import android.content.Context
 import android.view.View
 
 import com.tiefensuche.motionmate.ui.TextItemAdapter
@@ -12,17 +13,15 @@ import com.tiefensuche.motionmate.ui.TextItemAdapter
  * Basic TextItem that is contained in the [TextItemAdapter].
  * It holds description and content texts and can display a button.
  */
-internal open class TextItem(val description: String, private var content: String?) {
+internal open class TextItem(context: Context, description: Int) {
+    val description: String = context.getString(description)
+    var content: String = ""
     private var icon: Int = 0
     internal var buttonClickListener: View.OnClickListener? = null
     private var updateListener: UpdateListener? = null
 
     internal open val isSwipeable: Boolean
         get() = false
-
-    internal fun getContent(): String? {
-        return content
-    }
 
     internal open fun setContent(content: String) {
         this.content = content

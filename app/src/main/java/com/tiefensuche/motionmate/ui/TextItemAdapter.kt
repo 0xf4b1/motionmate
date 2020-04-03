@@ -44,7 +44,7 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
     }
 
     override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): TextItemAdapter.ViewHolder {
+                                    viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.cardview_text, parent, false)
         return ViewHolder(v)
     }
@@ -52,7 +52,7 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mDataset[position]
         holder.mTextViewDescription.text = item.description
-        holder.mTextViewContent.text = item.getContent()
+        holder.mTextViewContent.text = item.content
         if (item.buttonClickListener != null) {
             holder.mImageButton.setOnClickListener(item.buttonClickListener)
             holder.mImageButton.setImageResource(android.R.drawable.ic_media_pause)
