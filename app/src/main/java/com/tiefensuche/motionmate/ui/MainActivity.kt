@@ -19,7 +19,7 @@ import com.tiefensuche.motionmate.R
 import com.tiefensuche.motionmate.service.MotionService
 import com.tiefensuche.motionmate.ui.cards.MotionActivityTextItem
 import com.tiefensuche.motionmate.ui.cards.MotionStatisticsTextItem
-import com.tiefensuche.motionmate.ui.cards.TextItem
+import com.tiefensuche.motionmate.ui.cards.MotionTextItem
 import com.tiefensuche.motionmate.util.Database
 import com.tiefensuche.motionmate.util.Util
 import java.util.*
@@ -119,15 +119,16 @@ internal class MainActivity : AppCompatActivity() {
 
         // A card that displays sum of steps in the current month
         val stepsThisMonth = Database.getInstance(this).getSumSteps(startOfMonth.timeInMillis)
-        mAdapter.add(MotionStatisticsTextItem(getString(R.string.steps_month), stepsThisMonth))
+        mAdapter.add(MotionStatisticsTextItem(this, R.string.steps_month, stepsThisMonth))
 
         // A card that displays average distance in a day
-        val avgSteps = Database.getInstance(this).avgSteps
-        mAdapter.add(TextItem(getString(R.string.avg_distance), String.format(Locale.getDefault(), getString(R.string.steps_format), avgSteps * 0.762 / 1000, java.lang.Math.round(avgSteps))))
+        val item = MotionTextItem(this, R.string.avg_distance)
+        item.setContent(Database.getInstance(this).avgSteps)
+        mAdapter.add(item)
 
         // A card that displays overall sum of steps
         val overallSteps = Database.getInstance(this).getSumSteps(0)
-        mAdapter.add(MotionStatisticsTextItem(getString(R.string.overall_distance), overallSteps))
+        mAdapter.add(MotionStatisticsTextItem(this, R.string.overall_distance, overallSteps))
     }
 
     private fun subscribeService() {
@@ -172,7 +173,7 @@ internal class MainActivity : AppCompatActivity() {
         // initialize dynamic cards, e.g. activities, that are not yet added
         for (activity in activities) {
             val id = activity.getInt(MotionService.KEY_ID)
-            val item = MotionActivityTextItem(getString(R.string.new_activity), getString(R.string.new_activity_started), id, View.OnClickListener {
+            val item = MotionActivityTextItem(this, id, View.OnClickListener {
                 val i = Intent(this@MainActivity, MotionService::class.java)
                 i.action = MotionService.ACTION_TOGGLE_ACTIVITY
                 i.putExtra(MotionService.KEY_ID, id)
