@@ -27,7 +27,7 @@ internal class Database private constructor(context: Context) : SQLiteOpenHelper
             FIELD_TYPE_INTEGER -> cursor.getLong(0)
             FIELD_TYPE_FLOAT -> cursor.getFloat(0)
             FIELD_TYPE_NULL -> 0
-            else -> throw Exception("unexpected type")
+            else -> throw IllegalStateException("unexpected type")
         }
         cursor.close()
         return result
@@ -80,7 +80,7 @@ internal class Database private constructor(context: Context) : SQLiteOpenHelper
     }
 
     override fun onUpgrade(sqLiteDatabase: SQLiteDatabase, i: Int, i1: Int) {
-
+        // no-op
     }
 
     internal inner class Entry internal constructor(val timestamp: Long, val steps: Int)

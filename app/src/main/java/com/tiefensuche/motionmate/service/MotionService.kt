@@ -77,7 +77,7 @@ internal class MotionService : Service() {
         val manager = packageManager
 
         // connect sensor
-        val mSensorManager = getSystemService(Context.SENSOR_SERVICE) as? SensorManager ?: throw RuntimeException()
+        val mSensorManager = getSystemService(Context.SENSOR_SERVICE) as? SensorManager ?: throw IllegalStateException("could not get sensor service")
         var mStepSensor: Sensor? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && manager.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_COUNTER)) {
             // androids built in step counter
@@ -90,7 +90,7 @@ internal class MotionService : Service() {
                 }
 
                 override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-
+                    // no-op
                 }
             }
         } else if (manager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
@@ -112,7 +112,7 @@ internal class MotionService : Service() {
                 }
 
                 override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-
+                    // no-op
                 }
             }
         }
@@ -196,7 +196,7 @@ internal class MotionService : Service() {
     }
 
     private fun startService() {
-        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: throw RuntimeException()
+        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: throw IllegalStateException("could not get notification service")
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
         // Notification channels are only supported on Android O+.
